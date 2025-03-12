@@ -6,7 +6,7 @@ from matplotlib.animation import FuncAnimation
 
 # Global variables
 size = 5 # size of cube
-cube_intervals = 10 # speed of rotation (less is more)
+cube_intervals = 0.001 # speed of rotation (less is more)
 
 # Rotate functions
 def rotate_x(x, y, z, angle):
