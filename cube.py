@@ -6,26 +6,23 @@ from matplotlib.animation import FuncAnimation
 
 # Global variables
 size = 5 # size of cube
-cube_intervals = 0.001 # speed of rotation (less is more)
+cube_intervals = 0.1 # speed of rotation (less is more)
 
 # Rotate functions
-def rotate_x(x, y, z, angle):
-    cos, sin = math.cos(angle), math.sin(angle)
-    ry = y * cos - z * sin  
-    rz = y * sin + z * cos
-    return x, ry, rz
+def rotation_matrix_x(angle):
+    return np.array([[1, 0, 0],
+                     [0, math.cos(angle), -math.sin(angle)],
+                     [0, math.sin(angle), math.cos(angle)]])
 
-def rotate_y(x, y, z, angle):
-    cos, sin = math.cos(angle), math.sin(angle)
-    rx = x * cos + z * sin  
-    rz = -x * sin + z * cos
-    return rx, y, rz
+def rotation_matrix_y(angle):
+    return np.array([[math.cos(angle), 0, math.sin(angle)],
+                     [0, 1, 0],
+                     [-math.sin(angle), 0, math.cos(angle)]])
 
-def rotate_z(x, y, z, angle):
-    cos, sin = math.cos(angle), math.sin(angle)
-    rx = x * cos - y * sin  
-    ry = x * sin + y * cos
-    return rx, ry, z
+def rotation_matrix_z(angle):
+    return np.array([[math.cos(angle), -math.sin(angle), 0],
+                     [math.sin(angle), math.cos(angle), 0],
+                     [0, 0, 1]])
 
 # Cube vertices
 Cube = np.array([
@@ -49,27 +46,37 @@ ax = fig.add_subplot(projection="3d")
 
 
 # Set axis limits
-ax.set_xlim([-(size+3), (size+3)])
-ax.set_ylim([-(size+3), (size+3)])
-ax.set_zlim([-(size+3), (size+3)])
-
+ax.set_xlim([-(size+1), (size+1)])
+ax.set_ylim([-(size+1), (size+1)])
+ax.set_zlim([-(size+1), (size+1)])
+ax.set_box_aspect([1, 1, 1])  # Hold proporsjonene like
 
 def update_rotations(frame):
     
     
     # Set axis limits
     ax.clear()
-    ax.set_xlim([-(size+3), (size+3)])
-    ax.set_ylim([-(size+3), (size+3)])
-    ax.set_zlim([-(size+3), (size+3)])
+    ax.set_xlim([-(size+1), (size+1)])
+    ax.set_ylim([-(size+1), (size+1)])
+    ax.set_zlim([-(size+1), (size+1)])
     
 
     # Rotation angle (in radians)
     angle = math.radians(frame)
 
-    # Apply rotation
-    rotated_Cube = np.array([rotate_x(*rotate_y(*rotate_z(x, y, z, angle),angle),angle) for x, y, z in Cube])
+    Rz = rotation_matrix_z(angle)
+    Ry = rotation_matrix_y(angle)
+    Rx = rotation_matrix_x(angle)
 
+    rotated_points = Cube.copy()
+
+    # Apply rotation
+    for _ in range(3):  # Roter rundt alle akser (x, y, z)
+        rotated_points = np.dot(rotated_points, Rz)
+        rotated_points = np.dot(rotated_points, Ry)
+        rotated_points = np.dot(rotated_points, Rx)
+    
+    rotated_Cube = rotated_points
     # Plot vertices
     ax.scatter(rotated_Cube[:, 0], rotated_Cube[:, 1], rotated_Cube[:, 2], c='r', s=100)
 
@@ -81,5 +88,5 @@ def update_rotations(frame):
                                                                         # where 0 represent point 0 in cube (0,0,0) and
                                                                         # 1 represent point 1 in cube(5,0,0)
                                                                         # Plotwise: ax.plot([0,5],[0,0],[0,0], c="b") 
-animation = FuncAnimation(fig, update_rotations, frames=np.arange(0,360,2),interval = cube_intervals)
+animation = FuncAnimation(fig, update_rotations, frames=np.arange(0,360,2),interval = cube_intervals, repeat=True)
 plt.show()
