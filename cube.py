@@ -49,7 +49,7 @@ ax = fig.add_subplot(projection="3d")
 ax.set_xlim([-(size+1), (size+1)])
 ax.set_ylim([-(size+1), (size+1)])
 ax.set_zlim([-(size+1), (size+1)])
-ax.set_box_aspect([1, 1, 1])  # Hold proporsjonene like
+ax.set_box_aspect([1, 1, 1])
 
 def update_rotations(frame):
     
