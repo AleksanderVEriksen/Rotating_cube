@@ -71,7 +71,7 @@ def update_rotations(frame):
     rotated_points = Cube.copy()
 
     # Apply rotation
-    for _ in range(3):  # Roter rundt alle akser (x, y, z)
+    for _ in range(3):
         rotated_points = np.dot(rotated_points, Rz)
         rotated_points = np.dot(rotated_points, Ry)
         rotated_points = np.dot(rotated_points, Rx)
